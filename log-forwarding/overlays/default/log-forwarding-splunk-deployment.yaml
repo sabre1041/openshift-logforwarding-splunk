@@ -1,0 +1,26 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: log-forwarding-splunk
+  namespace: openshift-logging
+spec:
+  selector:
+    matchLabels:
+      app: log-forwarding-splunk
+  template:
+    metadata:
+      labels:
+        app: log-forwarding-splunk
+        deploymentconfig: log-forwarding-splunk
+    spec:
+      containers:
+        - name: log-forwarding-splunk
+      volumes:
+        - name: log-forwarding-splunk
+          secret:
+            secretName: log-forwarding-splunk
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key

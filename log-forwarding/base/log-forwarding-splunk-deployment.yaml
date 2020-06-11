@@ -1,0 +1,122 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: log-forwarding-splunk
+  namespace: openshift-logging
+  labels:
+    app: log-forwarding-splunk
+    app.kubernetes.io/component: log-forwarding-splunk
+    app.kubernetes.io/instance: log-forwarding-splunk
+    app.kubernetes.io/part-of: log-forwarding-splunk
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: log-forwarding-splunk
+  template:
+    metadata:
+      labels:
+        app: log-forwarding-splunk
+        deploymentconfig: log-forwarding-splunk
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      containers:
+        - resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+          terminationMessagePath: /dev/termination-log
+          name: log-forwarding-splunk
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: SHARED_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: log-forwarding-splunk
+                  key: shared_key
+            - name: CLUSTER_NAME
+              value: demo
+            - name: SPLUNK_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: log-forwarding-splunk-config
+                  key: splunk-hostname
+            - name: SPLUNK_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: log-forwarding-splunk-config
+                  key: splunk-protocol
+            - name: SPLUNK_INSECURE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-forwarding-splunk-config
+                  key: splunk-insecure
+            - name: SPLUNK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: log-forwarding-splunk
+                  key: HEC_TOKEN
+          imagePullPolicy: Always
+          nodeSelector:
+
+          volumeMounts:
+            - name: log-forwarding-splunk-config
+              readOnly: true
+              mountPath: /etc/fluent/
+            - mountPath: /secret/fluentd
+              name: log-forwarding-splunk
+              readOnly: true
+          terminationMessagePolicy: File
+          image: >-
+            registry.redhat.io/openshift4/ose-logging-fluentd:v4.4
+          args:
+            - scl
+            - enable
+            - rh-ruby25
+            - "--"
+            - fluentd
+          livenessProbe:
+            tcpSocket:
+              port: 24224
+            periodSeconds: 5
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 24224
+            periodSeconds: 3
+            timeoutSeconds: 2
+            initialDelaySeconds: 2
+          ports:
+            - containerPort: 24224
+              name: forwarder-tcp
+              protocol: TCP
+            - containerPort: 24224
+              name: forwarder-udp
+              protocol: UDP
+      serviceAccount: log-forwarding-splunk
+      volumes:
+        - name: log-forwarding-splunk-config
+          configMap:
+            name: log-forwarding-splunk-config
+            items:
+              - key: td-agent.conf
+                path: fluent.conf
+            defaultMode: 420
+            optional: true
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

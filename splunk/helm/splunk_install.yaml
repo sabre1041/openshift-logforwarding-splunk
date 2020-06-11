@@ -1,0 +1,11 @@
+---
+splunk:
+  defaultYml:
+    splunk:
+      hec_token: 4a8a737d-5452-426c-a6f7-106dca4e813f
+replicaCount: 1
+
+image:
+  repository: splunk/splunk
+  tag: 7.3-redhat
+  pullPolicy: IfNotPresent

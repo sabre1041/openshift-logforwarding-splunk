@@ -1,0 +1,21 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: log-forwarding-splunk
+  namespace: openshift-logging
+  labels:
+    app: log-forwarding-splunk
+    app.kubernetes.io/component: log-forwarding-splunk
+    app.kubernetes.io/instance: log-forwarding-splunk
+    app.kubernetes.io/part-of: log-forwarding-splunk
+spec:
+  ports:
+    - name: 24224-tcp
+      protocol: TCP
+      port: 24224
+      targetPort: 24224
+  selector:
+    app: log-forwarding-splunk
+    deploymentconfig: log-forwarding-splunk
+  type: ClusterIP
+  sessionAffinity: None
