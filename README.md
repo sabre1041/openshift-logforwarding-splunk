@@ -58,7 +58,11 @@ $ ./splunk-install.sh
 $ helm install openshift-logforwarding-splunk charts/openshift-logforwarding-splunk/
 ```
 
-4. 
+4. Annotate the `ClusterLogging` instance
+
+```
+$ oc annotate clusterlogging -n openshift-logging instance clusterlogging.openshift.io/logforwardingtechpreview=enabled
+```
 
 5. Verify that you can view logs in Splunk
 
