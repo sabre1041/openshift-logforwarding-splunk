@@ -1,0 +1,11 @@
+apiVersion: v2
+name: openshift-logforwarding-splunk
+description: Log Forwarding from OpenShift to Splunk
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+sources:
+  - https://github.com/elastic/kibana
+maintainers:
+- email: andy.block@gmail.com
+  name: Andrew Block

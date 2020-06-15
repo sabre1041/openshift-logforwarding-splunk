@@ -21,17 +21,17 @@ command -v git >/dev/null 2>&1 || { echo >&2 "Git is required but not installed.
 # Check if Git is installed
 command -v helm >/dev/null 2>&1 || { echo >&2 "Helm is required but not installed.  Aborting."; exit 1; } 
 
-oc apply -f ${DIR}/splunk/resources
+oc apply -f ${DIR}/assets/manifests/namespace.yaml
 
 # Helm Install
-if [ ! -d "${DIR}/splunk/helm/charts/splunk-helm-chart" ]; then
+if [ ! -d "${DIR}/charts/splunk-helm-chart" ]; then
   echo "Cloning Helm Chart"
-  git clone ${HELM_CHART_URL} ${DIR}/splunk/helm/charts/splunk-helm-chart
+  git clone ${HELM_CHART_URL} ${DIR}/charts/splunk-helm-chart
 fi
 
-cp -f ${DIR}/splunk/helm/route.yaml ${DIR}/splunk/helm/charts/splunk-helm-chart/splunk/templates/
+cp ${DIR}/assets/helm/templates/* ${DIR}/charts/splunk-helm-chart/splunk/templates
 
-helm upgrade --namespace ${SPLUNK_NAMESPACE} --install -f splunk/helm/splunk_install.yaml ${HELM_CHART_NAME} splunk/helm/splunk-helm-chart/splunk
+helm upgrade --namespace ${SPLUNK_NAMESPACE} --install -f ${DIR}/assets/helm/values/splunk_install.yaml ${HELM_CHART_NAME} ${DIR}/charts/splunk-helm-chart/splunk
 
 oc patch -n ${SPLUNK_NAMESPACE} deployment/${HELM_CHART_NAME} --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/env/-", "value":  { "name": "SPLUNK_LAUNCH_CONF", "value": "OPTIMISTIC_ABOUT_FILE_LOCKING=1" }  }]'
 oc patch -n ${SPLUNK_NAMESPACE} deployment/${HELM_CHART_NAME} --type='json' -p="[{\"op\": \"add\", \"path\": \"/spec/template/spec/containers/0/env/-\", \"value\":  { \"name\": \"SPLUNK_PASSWORD\", \"value\": \"${SPLUNK_PASSWORD}\" }  }]"
@@ -43,7 +43,7 @@ SPLUNK_ROUTE=https://$(oc get routes $HELM_CHART_NAME -n ${SPLUNK_NAMESPACE} -o 
 echo "Waiting for Splunk to become active"
 until $(curl -fLk --silent --output /dev/null ${SPLUNK_ROUTE}); do sleep 2; done
 
-SPLUNK_POD=$(oc get -n ${SPLUNK_NAMESPACE} pods -l=app.kubernetes.io/name=splunk -o jsonpath='{.items[-1:].metadata.name}')
+SPLUNK_POD=$(oc get -n ${SPLUNK_NAMESPACE} pods -l=app.kubernetes.io/name=splunk -o jsonpath='{.items[0].metadata.name}')
 
 OPENSHIFT_INDEX_CREATED=$(oc -n ${SPLUNK_NAMESPACE} exec ${SPLUNK_POD} -- curl -ks -u ${SPLUNK_USERNAME}:${SPLUNK_PASSWORD} -o /dev/null -w "%{http_code}" https://localhost:8089/services/data/indexes/${SPLUNK_OPENSHIFT_INDEX})
 

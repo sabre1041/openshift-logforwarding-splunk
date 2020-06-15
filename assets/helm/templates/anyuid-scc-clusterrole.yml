@@ -1,7 +1,8 @@
+{{- $fullName := include "splunk.fullname" . -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: allow-anyuid-scc
+  name: {{ $fullName }}-allow-anyuid-scc
 rules:
   - apiGroups:
       - security.openshift.io

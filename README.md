@@ -19,11 +19,31 @@ The following prerequisites must be satisfied prior to deploying this integratio
   * OpenShift Command Line Tool
   * Git
   * Helm
-  * OpenSSL
+  * OpenSSL (Optional)
+
+## Components
+
+The primary assets contained within this repository is a Helm Chart to deploy LogForwarding. Please refer to the [values.yaml](charts/openshift-logforwarding-splunk/values.yaml) file for the customizing the installation. 
+
+### SSL Communication
+
+#### Fluentd
+By default, SSL communication between the platform deployed Fluentd instances and the LogForwarding instance is not enabled It can be enabled by setting the `forwarding.fluentd.ssl=true` value. A default certificate and private key is available for use by default (CN=openshift-logforwarding-splunk.openshift-logging.svc). Otherwise, certificates can be provided by setting the `forwarding.fluentd.caFile` and `forwarding.fluentd.keyFile` to a path relative to the chart.
+
+#### Splunk
+
+Communication between the Fluentd Forwarder and Splunk can be exchanged using certificates. The certificate file can be referenced by setting the `forwarding.splunk.caFile` value.
+
+By default, certificate verification is disabled between the two components. It can be enabled by specifying `forwarding.splunk.insecure=false`
+
+## Splunk HEC Token
+
+A HEC token is used to communicate between the Fluentd forwarder and Splunk. It is required and can be provided in the `forwarding.splunk.token` value.
+
 
 ## Installation and Deployment
 
-With all of the prerequisites met, execute the following commands to deploy the solution:
+With all of the prerequisites met and an overview of the components provided in this repository, execute the following commands to deploy the solution:
 
 1. Login to OpenShift with a user with `cluster-admin` permissions
 2. Deploy Splunk
@@ -32,13 +52,15 @@ With all of the prerequisites met, execute the following commands to deploy the 
 $ ./splunk-install.sh
 ```
 
-3. Deploy log forwarding solution
+3. Deploy the log forwarding Helm chart
 
 ```
-$ ./deploy-log-forwarding.sh
+$ helm install openshift-logforwarding-splunk charts/openshift-logforwarding-splunk/
 ```
 
-4. Verify that you can view logs in Splunk
+4. 
+
+5. Verify that you can view logs in Splunk
 
    1. Login to Splunk by first accessing the Splunk route
 
@@ -49,9 +71,3 @@ $ ./deploy-log-forwarding.sh
    2. Search for OpenShift logs in the `openshift` namespace
 
    Search Query: `index=openshift`
-
-## Future State
-
-The following list of items are intended to be incorporated in the future
-
-* Conversion of Log Forwarding from Kustomize based solution to Helm

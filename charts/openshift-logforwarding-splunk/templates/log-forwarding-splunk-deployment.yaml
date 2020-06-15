@@ -1,23 +1,22 @@
+{{- $fullName := include "openshift-logforwarding-splunk.fullname" . -}}
+{{- $splunkSecret := printf "%s-splunk" $fullName -}}
+{{- $logForwardingConfig := printf "%s-config" $fullName -}}
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: log-forwarding-splunk
-  namespace: openshift-logging
+  name: {{ $fullName }}
   labels:
-    app: log-forwarding-splunk
-    app.kubernetes.io/component: log-forwarding-splunk
-    app.kubernetes.io/instance: log-forwarding-splunk
-    app.kubernetes.io/part-of: log-forwarding-splunk
+    app.kubernetes.io/component: fluentd
+{{ include "openshift-logforwarding-splunk.labels" . | indent 4 }}
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: log-forwarding-splunk
+      app: {{ $fullName }}
   template:
     metadata:
       labels:
-        app: log-forwarding-splunk
-        deploymentconfig: log-forwarding-splunk
+        app: {{ $fullName }}
     spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
@@ -30,53 +29,78 @@ spec:
               cpu: 500m
               memory: 1024Mi
           terminationMessagePath: /dev/termination-log
-          name: log-forwarding-splunk
+          name: {{ $fullName }}
           env:
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: spec.nodeName
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}
+                  key: fluentd-loglevel
             - name: SHARED_KEY
               valueFrom:
                 secretKeyRef:
-                  name: log-forwarding-splunk
+                  name: {{ $fullName }}
                   key: shared_key
-            - name: CLUSTER_NAME
-              value: demo
             - name: SPLUNK_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: log-forwarding-splunk-config
+                  name: {{ $fullName }}
                   key: splunk-hostname
+            - name: SPLUNK_SOURCETYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}
+                  key: splunk-sourcetype
+            - name: SPLUNK_SOURCE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}
+                  key: splunk-source
+            - name: SPLUNK_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}
+                  key: splunk-port
             - name: SPLUNK_PROTOCOL
               valueFrom:
                 configMapKeyRef:
-                  name: log-forwarding-splunk-config
+                  name: {{ $fullName }}
                   key: splunk-protocol
             - name: SPLUNK_INSECURE
               valueFrom:
                 configMapKeyRef:
-                  name: log-forwarding-splunk-config
+                  name: {{ $fullName }}
                   key: splunk-insecure
             - name: SPLUNK_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: log-forwarding-splunk
-                  key: HEC_TOKEN
+                  name: {{ $fullName }}
+                  key: hec-token
+            - name: SPLUNK_INDEX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}
+                  key: splunk-index
+            - name: FLUENTD_SSL_PASSPHRASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}
+                  key: fluentd-ssl-passsphrase
           imagePullPolicy: Always
-          nodeSelector:
-
           volumeMounts:
-            - name: log-forwarding-splunk-config
+            - name: {{ $logForwardingConfig }}
               readOnly: true
               mountPath: /etc/fluent/
             - mountPath: /secret/fluentd
-              name: log-forwarding-splunk
+              name: {{ $fullName }}
               readOnly: true
           terminationMessagePolicy: File
-          image: >-
-            registry.redhat.io/openshift4/ose-logging-fluentd:v4.4
+          image: {{ .Values.forwarding.fluentd.image }}
           args:
             - scl
             - enable
@@ -102,16 +126,24 @@ spec:
             - containerPort: 24224
               name: forwarder-udp
               protocol: UDP
-      serviceAccount: log-forwarding-splunk
+      serviceAccount: {{ $fullName }}
       volumes:
-        - name: log-forwarding-splunk-config
+        - name: {{ $logForwardingConfig }}
           configMap:
-            name: log-forwarding-splunk-config
+            name: {{ $fullName }}
             items:
               - key: td-agent.conf
                 path: fluent.conf
             defaultMode: 420
             optional: true
+        - name: {{ $fullName }}
+          secret:
+            secretName: {{ $fullName }}
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
       dnsPolicy: ClusterFirst
   strategy:
     type: RollingUpdate

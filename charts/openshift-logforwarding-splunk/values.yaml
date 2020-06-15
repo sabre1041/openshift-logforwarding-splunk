@@ -1,0 +1,40 @@
+
+openshift:
+  logging:
+    namespace: openshift-logging
+    elasticsearch:
+      port: 9200
+  forwarding:
+    audit:
+      elasticsearch: true
+      splunk: true
+    app:
+      elasticsearch: true
+      splunk: true
+    infra:
+      elasticsearch: true
+      splunk: true
+
+forwarding:
+  fluentd:
+    port: 24224
+    sharedkey: splunkforwarding
+    passphrase: ""
+    ssl: true
+    caFile: files/default-openshift-logging-fluentd.crt
+    keyFile: files/default-openshift-logging-fluentd.key
+    loglevel: warn
+    image: registry.redhat.io/openshift4/ose-logging-fluentd:v4.4
+  splunk:
+    # Specify Splunk HEC Token and Index
+    token: 
+    index: openshift
+    protocol: https
+    hostname: splunk.splunk.svc
+    port: 8088"
+    insecure: true
+    sourcetype: openshift
+    source: openshift
+
+    # Specify the CA Certificate for Splunk
+    #caFile: "files/splunk-ca.crt"
