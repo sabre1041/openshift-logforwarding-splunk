@@ -6,8 +6,8 @@ openshift:
       port: 9200
   forwarding:
     audit:
-      elasticsearch: true
-      splunk: true
+      elasticsearch: false
+      splunk: false
     app:
       elasticsearch: true
       splunk: true
