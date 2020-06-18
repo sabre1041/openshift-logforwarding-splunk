@@ -41,7 +41,6 @@ By default, certificate verification is disabled between the two components. It 
 
 A HEC token is used to communicate between the Fluentd forwarder and Splunk. It is required and can be provided in the `forwarding.splunk.token` value.
 
-
 ## Installation and Deployment
 
 With all of the prerequisites met and an overview of the components provided in this repository, execute the following commands to deploy the solution:
@@ -76,3 +75,4 @@ $ oc annotate clusterlogging -n openshift-logging instance clusterlogging.opensh
    2. Search for OpenShift logs in the `openshift` namespace
 
    Search Query: `index=openshift`
+
