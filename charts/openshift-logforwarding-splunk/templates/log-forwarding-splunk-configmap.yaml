@@ -49,6 +49,9 @@ data:
       hec_port "#{ENV['SPLUNK_PORT'] }"
       hec_token "#{ENV['SPLUNK_TOKEN'] }"
       host "#{ENV['NODE_NAME']}"
+      {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
+      ca_file /secrets/splunk/splunk-ca.crt
+      {{- end }}
       <buffer>
         @type memory
         chunk_limit_records 100000

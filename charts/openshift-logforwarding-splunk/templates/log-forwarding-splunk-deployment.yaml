@@ -99,6 +99,11 @@ spec:
             - mountPath: /secret/fluentd
               name: {{ $fullName }}
               readOnly: true
+            {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
+            - mountPath: /secret/splunk
+              name: splpunk-certs
+              readOnly: true
+            {{- end }}
           terminationMessagePolicy: File
           image: {{ .Values.forwarding.fluentd.image }}
           args:
@@ -144,6 +149,14 @@ spec:
                 path: tls.crt
               - key: tls.key
                 path: tls.key
+        {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
+        - name: splunk-certs
+          secret:
+            secretName: {{ $fullName }}-splunk
+            items:
+              - key: splunk-ca.crt
+                path: splunk-ca.crt
+        {{- end }}
       dnsPolicy: ClusterFirst
   strategy:
     type: RollingUpdate

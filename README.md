@@ -52,10 +52,10 @@ With all of the prerequisites met and an overview of the components provided in 
 $ ./splunk-install.sh
 ```
 
-3. Deploy the log forwarding Helm chart
+3. Deploy the log forwarding Helm chart by providing the value of the HEC token along with any additional values
 
 ```
-$ helm install openshift-logforwarding-splunk charts/openshift-logforwarding-splunk/
+$ helm install openshift-logforwarding-splunk charts/openshift-logforwarding-splunk/ --set forwarding.splunk.token=<token>
 ```
 
 4. Annotate the `ClusterLogging` instance
