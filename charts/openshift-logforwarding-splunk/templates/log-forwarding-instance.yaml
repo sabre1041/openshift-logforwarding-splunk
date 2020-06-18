@@ -5,7 +5,7 @@ metadata:
   name: instance
   namespace: openshift-logging
   labels:
-    app.kubernetes.io/component: custer-logging
+    app.kubernetes.io/component: cluster-logging
 {{ include "openshift-logforwarding-splunk.labels" . | indent 4 }}
 spec:
   disableDefaultForwarding: true
