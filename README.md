@@ -5,7 +5,7 @@ This repository contains assets to forward container logs from an OpenShift Cont
 
 ## Overview
 
-OpenShift contains a container log aggregation feature built on the ElasticSearch, Fluentd and Kibana (EFK) stack. Support is available (Tech Preview as of 4.3/4.4) to send logs generated on the platform to external targets using the Fluentd forwarder feature with output in Splunk using the HTTP Event Collector (HEC). 
+OpenShift contains a container [log aggregation feature](https://docs.openshift.com/container-platform/4.4/logging/config/cluster-logging-external.html) built on the ElasticSearch, Fluentd and Kibana (EFK) stack. Support is available (Tech Preview as of 4.3/4.4) to send logs generated on the platform to external targets using the Fluentd forwarder feature with output in Splunk using the HTTP Event Collector (HEC). 
 
 The assets contained in this repository support demonstrating this functionality by establishing a non persistent deployment of Splunk to OpenShift in a namespace called `splunk` and sending application container logs to an index in Splunk called `openshift`.
 
@@ -17,9 +17,9 @@ The following prerequisites must be satisfied prior to deploying this integratio
 * Base Cluster logging installed
 * Tools
   * OpenShift Command Line Tool
-  * Git
-  * Helm
-  * OpenSSL (Optional)
+  * [Git](https://git-scm.com/)
+  * [Helm](https://helm.s/)
+  * [OpenSSL](https://www.openssl.org) (Optional)
 
 ## Components
 
@@ -28,6 +28,7 @@ The primary assets contained within this repository is a Helm Chart to deploy Lo
 ### SSL Communication
 
 #### Fluentd
+
 By default, SSL communication between the platform deployed Fluentd instances and the LogForwarding instance is not enabled It can be enabled by setting the `forwarding.fluentd.ssl=true` value. A default certificate and private key is available for use by default (CN=openshift-logforwarding-splunk.openshift-logging.svc). Otherwise, certificates can be provided by setting the `forwarding.fluentd.caFile` and `forwarding.fluentd.keyFile` to a path relative to the chart.
 
 #### Splunk
