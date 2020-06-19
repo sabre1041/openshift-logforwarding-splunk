@@ -22,12 +22,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - resources:
-            requests:
-              cpu: 100m
-              memory: 512Mi
-            limits:
-              cpu: 500m
-              memory: 1024Mi
+            {{- toYaml .Values.resources | nindent 12 }}
           terminationMessagePath: /dev/termination-log
           name: {{ $fullName }}
           env:
@@ -132,6 +127,18 @@ spec:
               name: forwarder-udp
               protocol: UDP
       serviceAccount: {{ $fullName }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       volumes:
         - name: {{ $logForwardingConfig }}
           configMap:

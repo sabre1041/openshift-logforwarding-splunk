@@ -25,6 +25,16 @@ forwarding:
     keyFile: files/default-openshift-logging-fluentd.key
     loglevel: warn
     image: registry.redhat.io/openshift4/ose-logging-fluentd:v4.4
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1024Mi
   splunk:
     # Specify Splunk HEC Token and Index
     token: 
@@ -38,3 +48,4 @@ forwarding:
 
     # Specify the CA Certificate for Splunk
     #caFile: "files/splunk-ca.crt"
+  
