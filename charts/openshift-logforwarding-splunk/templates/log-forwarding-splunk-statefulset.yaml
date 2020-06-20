@@ -97,6 +97,8 @@ spec:
             - mountPath: /secret/fluentd
               name: {{ $fullName }}
               readOnly: true
+            - name: buffer
+              mountPath: "/var/log/fluentd"
             {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
             - mountPath: /secret/splunk
               name: splunk-certs
