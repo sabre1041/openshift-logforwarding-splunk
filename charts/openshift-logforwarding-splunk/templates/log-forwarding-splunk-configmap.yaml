@@ -52,14 +52,11 @@ data:
       {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
       ca_file /secrets/splunk/splunk-ca.crt
       {{- end }}
+      {{- with .Values.forwarding.fluentd.buffer }}
       <buffer>
-        @type memory
-        chunk_limit_records 100000
-        chunk_limit_size 200m
-        flush_interval 5s
-        flush_thread_count 1
-        overflow_action block
-        retry_max_times 3
-        total_limit_size 600m
+      {{- range $parameter, $value := . }}
+        {{ $parameter }} {{ $value }}
+      {{- end }}
       </buffer>
+      {{- end }}
     </match>

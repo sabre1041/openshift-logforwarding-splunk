@@ -24,6 +24,19 @@ forwarding:
     caFile: files/default-openshift-logging-fluentd.crt
     keyFile: files/default-openshift-logging-fluentd.key
     loglevel: warn
+    replicas: 2
+    persistence:
+      enabled: false
+      size: 20Gi
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      # storageClass: "-"
+      storageClass: ""
+      accessMode: ReadWriteOnce
     image: registry.redhat.io/openshift4/ose-logging-fluentd:v4.4
     nodeSelector: {}
     tolerations: []
@@ -35,6 +48,17 @@ forwarding:
       limits:
         cpu: 500m
         memory: 1024Mi
+    updateStrategy:
+      type: "RollingUpdate"
+    buffer:
+      "@type": memory
+      chunk_limit_records: 100000
+      chunk_limit_size: 200m
+      flush_interval: 5s
+      flush_thread_count: 1
+      overflow_action: block
+      retry_max_times: 3
+      total_limit_size: 600m
   splunk:
     # Specify Splunk HEC Token and Index
     token: 

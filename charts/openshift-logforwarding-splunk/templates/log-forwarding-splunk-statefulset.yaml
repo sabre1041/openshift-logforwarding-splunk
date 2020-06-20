@@ -1,15 +1,18 @@
 {{- $fullName := include "openshift-logforwarding-splunk.fullname" . -}}
 {{- $splunkSecret := printf "%s-splunk" $fullName -}}
 {{- $logForwardingConfig := printf "%s-config" $fullName -}}
-kind: Deployment
 apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: {{ $fullName }}
   labels:
     app.kubernetes.io/component: fluentd
 {{ include "openshift-logforwarding-splunk.labels" . | indent 4 }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.forwarding.fluentd.replicas }}
+  serviceName: {{ $fullName }}-headless
+  updateStrategy:
+{{ toYaml .Values.forwarding.fluentd.updateStrategy | indent 4 }}
   selector:
     matchLabels:
       app: {{ $fullName }}
@@ -96,7 +99,7 @@ spec:
               readOnly: true
             {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
             - mountPath: /secret/splunk
-              name: splpunk-certs
+              name: splunk-certs
               readOnly: true
             {{- end }}
           terminationMessagePolicy: File
@@ -156,6 +159,10 @@ spec:
                 path: tls.crt
               - key: tls.key
                 path: tls.key
+        {{- if not .Values.forwarding.fluentd.persistence.enabled }}
+        - name: buffer
+          emptyDir: {}
+        {{- end }}
         {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
         - name: splunk-certs
           secret:
@@ -165,10 +172,21 @@ spec:
                 path: splunk-ca.crt
         {{- end }}
       dnsPolicy: ClusterFirst
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
-  revisionHistoryLimit: 10
-  progressDeadlineSeconds: 600
+  {{- if .Values.forwarding.fluentd.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: buffer
+    spec:
+      accessModes:
+      - {{ .Values.forwarding.fluentd.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.forwarding.fluentd.persistence.size }}
+      {{- if .Values.forwarding.fluentd.persistence.storageClass }}
+      {{- if (eq "-" .Values.forwarding.fluentd.persistence.storageClass) }}
+      storageClassName: ""
+      {{- else }}
+      storageClassName: "{{ .Values.forwarding.fluentd.persistence.storageClass }}"
+      {{- end }}
+      {{- end }}
+  {{- end }}
