@@ -78,7 +78,7 @@ forwarding:
     index: openshift
     protocol: https
     hostname: splunk.splunk.svc
-    port: 8088"
+    port: 8088
     insecure: true
     sourcetype: openshift
     source: openshift
