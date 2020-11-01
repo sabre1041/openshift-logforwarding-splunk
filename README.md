@@ -60,6 +60,8 @@ $ helm upgrade -i --namespace=openshift-logging openshift-logforwarding-splunk c
 
 4. Annotate the `ClusterLogging` instance
 
+OpenShift environments (version <4.6) with the Tech Preview (TP) of the Log Forwarding API required the `ClusterLogging` instance be annotated as follows.
+
 ```
 $ oc annotate clusterlogging -n openshift-logging instance clusterlogging.openshift.io/logforwardingtechpreview=enabled
 ```
