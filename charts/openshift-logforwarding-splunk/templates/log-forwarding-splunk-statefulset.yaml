@@ -25,7 +25,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.forwarding.fluentd.resources | nindent 12 }}
           terminationMessagePath: /dev/termination-log
           name: {{ $fullName }}
           env:
@@ -132,15 +132,15 @@ spec:
               name: forwarder-udp
               protocol: UDP
       serviceAccount: {{ $fullName }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.forwarding.fluentd.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+    {{- with .Values.forwarding.fluentd.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with .Values.forwarding.fluentd.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
