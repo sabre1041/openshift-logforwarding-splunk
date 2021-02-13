@@ -24,6 +24,8 @@ forwarding:
     keyFile: files/default-openshift-logging-fluentd.key
     loglevel: warn
     replicas: 2
+    # Set to true when version <4.6
+    scl: false
     persistence:
       enabled: false
       size: 5Gi
@@ -36,7 +38,7 @@ forwarding:
       # storageClass: "-"
       storageClass: ""
       accessMode: ReadWriteOnce
-    image: registry.redhat.io/openshift4/ose-logging-fluentd:v4.4
+    image: registry.redhat.io/openshift4/ose-logging-fluentd:v4.6
     nodeSelector: {}
     tolerations: []
     affinity: {}

@@ -107,10 +107,12 @@ spec:
           terminationMessagePolicy: File
           image: {{ .Values.forwarding.fluentd.image }}
           args:
+{{- if .Values.forwarding.fluentd.scl }}
             - scl
             - enable
             - rh-ruby25
             - "--"
+{{- end }}
             - fluentd
           livenessProbe:
             tcpSocket:
