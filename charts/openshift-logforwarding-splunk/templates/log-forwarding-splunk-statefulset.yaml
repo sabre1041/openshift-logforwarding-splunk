@@ -159,9 +159,9 @@ spec:
           secret:
             secretName: {{ $fullName }}
             items:
-              - key: tls.crt
+              - key: forwarder-tls.crt
                 path: tls.crt
-              - key: tls.key
+              - key: forwarder-tls.key
                 path: tls.key
         {{- if not .Values.forwarding.fluentd.persistence.enabled }}
         - name: buffer
