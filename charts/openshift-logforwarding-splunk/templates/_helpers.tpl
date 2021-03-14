@@ -65,13 +65,32 @@ Create the name of the service account to use
 
 
 {{/*
+Create the name of the forwarder TLS certificate file name
+*/}}
+{{- define "openshift-logforwarding-splunk.certificateName" -}}
+{{- if semverCompare "<1.20" (include "openshift-logforwarding-splunk.kubeVersion" .) -}}
+{{- print "tls" -}}
+{{- else -}}
+{{- print "forwarder-tls" -}}
+{{- end -}}
+{{- end -}}
+
+
+{{/*
 Generate certificates for the fluentd forwarder. Sprig library does provide proper support
 */}}
 {{- define "openshift-logforwarding-splunk.gen-fluentd-certs" -}}
 {{- $fullname := include "openshift-logforwarding-splunk.fullname" . -}}
 {{- $ca := genCA  (printf "%s.%s.svc" $fullname .Release.Namespace) 730 -}}
 {{- $cert := genSignedCert  (printf "%s-%s.svc" $fullname .Release.Namespace) nil nil 730 $ca -}}
-forwarder-tls.crt: {{ $cert.Cert | b64enc }}
-forwarder-tls.key: {{ $cert.Key | b64enc }}
+{{ (include "openshift-logforwarding-splunk.certificateName" .) }}.crt: {{ $cert.Cert | b64enc }}
+{{ (include "openshift-logforwarding-splunk.certificateName" .) }}.key: {{ $cert.Key | b64enc }}
 ca-bundle.crt: {{ $cert.Cert | b64enc }}
+{{- end -}}
+
+{{/*
+Return the target Kubernetes version
+*/}}
+{{- define "openshift-logforwarding-splunk.kubeVersion" -}}
+{{- default .Capabilities.KubeVersion.Version .Values.openshift.kubeVersion -}}
 {{- end -}}

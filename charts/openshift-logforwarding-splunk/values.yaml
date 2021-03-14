@@ -13,6 +13,7 @@ openshift:
     infra:
       elasticsearch: true
       splunk: true
+  # kubeVersion: v1.20
 
 forwarding:
   fluentd:

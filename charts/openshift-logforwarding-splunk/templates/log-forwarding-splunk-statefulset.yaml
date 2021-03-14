@@ -1,6 +1,7 @@
 {{- $fullName := include "openshift-logforwarding-splunk.fullname" . -}}
 {{- $splunkSecret := printf "%s-splunk" $fullName -}}
 {{- $logForwardingConfig := printf "%s-config" $fullName -}}
+{{- $logForwardingCertificateName := include "openshift-logforwarding-splunk.certificateName" . -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -159,9 +160,9 @@ spec:
           secret:
             secretName: {{ $fullName }}
             items:
-              - key: forwarder-tls.crt
+              - key: {{ $logForwardingCertificateName }}.crt
                 path: tls.crt
-              - key: forwarder-tls.key
+              - key: {{ $logForwardingCertificateName }}.key
                 path: tls.key
         {{- if not .Values.forwarding.fluentd.persistence.enabled }}
         - name: buffer
