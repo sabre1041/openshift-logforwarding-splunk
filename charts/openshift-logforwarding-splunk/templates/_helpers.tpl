@@ -68,7 +68,7 @@ Create the name of the service account to use
 Create the name of the forwarder TLS certificate file name
 */}}
 {{- define "openshift-logforwarding-splunk.certificateName" -}}
-{{- if semverCompare "<1.20" (include "openshift-logforwarding-splunk.kubeVersion" .) -}}
+{{- if semverCompare "<1.19" (include "openshift-logforwarding-splunk.kubeVersion" .) -}}
 {{- print "tls" -}}
 {{- else -}}
 {{- print "forwarder-tls" -}}
