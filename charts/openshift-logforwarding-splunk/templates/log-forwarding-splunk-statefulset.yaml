@@ -85,19 +85,23 @@ spec:
                 configMapKeyRef:
                   name: {{ $fullName }}
                   key: splunk-index
+            {{- if .Values.forwarding.fluentd.ssl }}
             - name: FLUENTD_SSL_PASSPHRASE
               valueFrom:
                 secretKeyRef:
                   name: {{ $fullName }}
                   key: fluentd-ssl-passsphrase
+            {{- end }}
           imagePullPolicy: Always
           volumeMounts:
             - name: {{ $logForwardingConfig }}
               readOnly: true
               mountPath: /etc/fluent/
+            {{- if .Values.forwarding.fluentd.ssl }}
             - mountPath: /secret/fluentd
               name: {{ $fullName }}
               readOnly: true
+            {{- end }}
             - name: buffer
               mountPath: "/var/log/fluentd"
             {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
@@ -156,6 +160,7 @@ spec:
                 path: fluent.conf
             defaultMode: 420
             optional: true
+        {{- if .Values.forwarding.fluentd.ssl }}
         - name: {{ $fullName }}
           secret:
             secretName: {{ $fullName }}
@@ -164,6 +169,7 @@ spec:
                 path: tls.crt
               - key: {{ $logForwardingCertificateName }}.key
                 path: tls.key
+        {{- end }}
         {{- if not .Values.forwarding.fluentd.persistence.enabled }}
         - name: buffer
           emptyDir: {}

@@ -31,11 +31,13 @@ data:
         private_key_passphrase "#{ENV['FLUENTD_SSL_PASSPHRASE'] }"
       </transport>
 {{ end }}
+
+{{ if .Values.forwarding.fluentd.ssl }}
       <security>
         shared_key "#{ENV['SHARED_KEY'] }"
         self_hostname "#{ENV['HOSTNAME']}"
       </security>
-
+{{ end }}
     </source>
 
     <match **>

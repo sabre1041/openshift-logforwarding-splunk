@@ -14,8 +14,10 @@ spec:
     - endpoint: "{{ $fullName }}.{{ .Release.Namespace }}.svc:{{ $.Values.forwarding.fluentd.port }}"
       name: {{ $fullName }}
       type: forward
+      {{- if .Values.forwarding.fluentd.ssl }}
       secret:
         name: {{ $fullName }}
+      {{- end }}
     - endpoint: "elasticsearch.{{ $.Values.openshift.logging.namespace }}.svc:{{ $.Values.openshift.logging.elasticsearch.port }}"
       name: elasticsearch
       secret:

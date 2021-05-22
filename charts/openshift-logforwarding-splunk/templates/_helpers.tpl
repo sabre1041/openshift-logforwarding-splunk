@@ -94,3 +94,14 @@ Return the target Kubernetes version
 {{- define "openshift-logforwarding-splunk.kubeVersion" -}}
 {{- default .Capabilities.KubeVersion.Version .Values.openshift.kubeVersion -}}
 {{- end -}}
+
+{{/*
+Return the protocol for Fluentd forwarding
+*/}}
+{{- define "openshift-logforwarding-splunk.fluentd.protocol" -}}
+{{- if .Values.forwarding.fluentd.ssl -}}
+{{- print "tls" -}}
+{{- else -}}
+{{- print "tcp" -}}
+{{- end -}}
+{{- end -}}

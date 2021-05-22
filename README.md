@@ -29,7 +29,7 @@ The primary assets contained within this repository is a Helm Chart to deploy Lo
 
 #### Fluentd
 
-By default, SSL communication between the platform deployed Fluentd instances and the LogForwarding instance is not enabled It can be enabled by setting the `forwarding.fluentd.ssl=true` value. A default certificate and private key is available for use by default (CN=openshift-logforwarding-splunk.openshift-logging.svc). Otherwise, certificates can be provided by setting the `forwarding.fluentd.caFile` and `forwarding.fluentd.keyFile` to a path relative to the chart.
+By default, SSL communication between the platform deployed Fluentd instances and the LogForwarding instance is enabled by default. It can be disabled by setting the `forwarding.fluentd.ssl=false` value. A default certificate and private key is available for use by default (CN=openshift-logforwarding-splunk.openshift-logging.svc). Otherwise, certificates can be provided by setting the `forwarding.fluentd.caFile` and `forwarding.fluentd.keyFile` to a path relative to the chart.
 
 #### Splunk
 
