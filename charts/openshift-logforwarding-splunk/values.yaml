@@ -21,8 +21,8 @@ forwarding:
     sharedkey: splunkforwarding
     passphrase: ""
     ssl: true
-    caFile: files/default-openshift-logging-fluentd.crt
-    keyFile: files/default-openshift-logging-fluentd.key
+    # caFile: files/default-openshift-logging-fluentd.crt
+    # keyFile: files/default-openshift-logging-fluentd.key
     loglevel: warn
     replicas: 2
     # Set to true when version <4.6
