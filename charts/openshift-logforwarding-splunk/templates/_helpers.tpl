@@ -82,7 +82,7 @@ Generate certificates for the fluentd forwarder. Sprig library does provide prop
 {{- define "openshift-logforwarding-splunk.gen-fluentd-certs" -}}
 {{- $fullname := include "openshift-logforwarding-splunk.fullname" . -}}
 {{- $ca := genCA  (printf "%s.%s.svc" $fullname .Release.Namespace) 730 -}}
-{{- $cert := genSignedCert  (printf "%s-%s.svc" $fullname .Release.Namespace) nil nil 730 $ca -}}
+{{- $cert := genSignedCert  (printf "%s.%s.svc" $fullname .Release.Namespace) nil nil 730 $ca -}}
 {{ (include "openshift-logforwarding-splunk.certificateName" .) }}.crt: {{ $cert.Cert | b64enc }}
 {{ (include "openshift-logforwarding-splunk.certificateName" .) }}.key: {{ $cert.Key | b64enc }}
 ca-bundle.crt: {{ $cert.Cert | b64enc }}
