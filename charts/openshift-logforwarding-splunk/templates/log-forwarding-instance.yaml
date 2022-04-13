@@ -4,7 +4,7 @@ apiVersion: logging.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
   name: instance
-  namespace: openshift-logging
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/component: cluster-logging
 {{ include "openshift-logforwarding-splunk.labels" . | indent 4 }}
