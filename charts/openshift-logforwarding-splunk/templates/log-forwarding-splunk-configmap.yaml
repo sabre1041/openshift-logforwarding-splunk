@@ -53,7 +53,7 @@ data:
       hec_token "#{ENV['SPLUNK_TOKEN'] }"
       host "#{ENV['NODE_NAME']}"
       {{- if and (not .Values.forwarding.splunk.insecure) .Values.forwarding.splunk.caFile }}
-      ca_file /secrets/splunk/splunk-ca.crt
+      ca_file /secret/splunk/splunk-ca.crt
       {{- end }}
       {{- with .Values.forwarding.fluentd.buffer }}
       <buffer>
