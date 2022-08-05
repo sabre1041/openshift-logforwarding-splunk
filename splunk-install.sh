@@ -26,6 +26,7 @@ oc apply -f ${DIR}/assets/manifests/namespace.yaml
 # Helm Install
 if [ ! -d "${DIR}/charts/splunk-helm-chart" ]; then
   echo "Cloning Helm Chart"
+  mkdir "${DIR}/charts"
   git clone ${HELM_CHART_URL} ${DIR}/charts/splunk-helm-chart
 fi
 
