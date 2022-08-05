@@ -5,7 +5,7 @@ This repository contains assets to forward container logs from an OpenShift Cont
 
 ## Overview
 
-OpenShift contains a container [log aggregation feature](https://docs.openshift.com/container-platform/4.4/logging/config/cluster-logging-external.html) built on the ElasticSearch, Fluentd and Kibana (EFK) stack. Support is available (Tech Preview as of 4.3/4.4) to send logs generated on the platform to external targets using the Fluentd forwarder feature with output in Splunk using the HTTP Event Collector (HEC). 
+OpenShift contains a container [log aggregation feature](https://docs.openshift.com/container-platform/4.4/logging/config/cluster-logging-external.html) built on the ElasticSearch, Fluentd and Kibana (EFK) stack. Support is available (Tech Preview as of 4.3/4.4) to send logs generated on the platform to external targets using the Fluentd forwarder feature with output in Splunk using the HTTP Event Collector (HEC).
 
 The assets contained in this repository support demonstrating this functionality by establishing a non persistent deployment of Splunk to OpenShift in a namespace called `splunk` and sending application container logs to an index in Splunk called `openshift`.
 
@@ -23,7 +23,7 @@ The following prerequisites must be satisfied prior to deploying this integratio
 
 ## Components
 
-The primary assets contained within this repository is a Helm Chart to deploy LogForwarding. Please refer to the [values.yaml](charts/openshift-logforwarding-splunk/values.yaml) file for the customizing the installation. 
+The primary assets contained within this repository is a Helm Chart to deploy LogForwarding. Please refer to the [values.yaml](charts/openshift-logforwarding-splunk/values.yaml) file for the customizing the installation.
 
 ### SSL Communication
 
@@ -49,13 +49,20 @@ With all of the prerequisites met and an overview of the components provided in 
 2. Deploy Splunk
 
 ```
-$ ./splunk-install.sh
+./splunk-install.sh
+```
+
+3. Add the Red Hat Community of Practice Helm chart repository which contains the OpenShift Log Forwarding Splunk Chart
+
+```
+helm repo add redhat-cop https://redhat-cop.github.io/helm-charts
+helm repo update
 ```
 
 3. Deploy the log forwarding Helm chart by providing the value of the HEC token along with any additional values
 
 ```
-$ helm upgrade -i --namespace=openshift-logging openshift-logforwarding-splunk charts/openshift-logforwarding-splunk/ --set forwarding.splunk.token=<token>
+helm upgrade -i --namespace=openshift-logging openshift-logforwarding-splunk redhat-cop/openshift-logforwarding-splunk --set forwarding.splunk.token=<token>
 ```
 
 4. Annotate the `ClusterLogging` instance
@@ -63,7 +70,7 @@ $ helm upgrade -i --namespace=openshift-logging openshift-logforwarding-splunk c
 OpenShift environments (version <4.6) with the Tech Preview (TP) of the Log Forwarding API required the `ClusterLogging` instance be annotated as follows.
 
 ```
-$ oc annotate clusterlogging -n openshift-logging instance clusterlogging.openshift.io/logforwardingtechpreview=enabled
+oc annotate clusterlogging -n openshift-logging instance clusterlogging.openshift.io/logforwardingtechpreview=enabled
 ```
 
 5. Verify that you can view logs in Splunk
@@ -71,10 +78,9 @@ $ oc annotate clusterlogging -n openshift-logging instance clusterlogging.opensh
    1. Login to Splunk by first accessing the Splunk route
 
    ```
-   $ echo "https://$(oc get routes -n splunk splunk -o jsonpath='{.spec.host}')"
+   echo "https://$(oc get routes -n splunk splunk -o jsonpath='{.spec.host}')"
    ```
 
    2. Search for OpenShift logs in the `openshift` namespace
 
    Search Query: `index=openshift`
-
