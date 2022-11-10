@@ -18,7 +18,7 @@ command -v oc >/dev/null 2>&1 || { echo >&2 "OpenShift CLI is required but not i
 # Check if Git is installed
 command -v git >/dev/null 2>&1 || { echo >&2 "Git is required but not installed.  Aborting."; exit 1; } 
 
-# Check if Git is installed
+# Check if Helm is installed
 command -v helm >/dev/null 2>&1 || { echo >&2 "Helm is required but not installed.  Aborting."; exit 1; } 
 
 oc apply -f ${DIR}/assets/manifests/namespace.yaml
